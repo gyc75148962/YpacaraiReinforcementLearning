@@ -1,20 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Jul 28 11:15:50 2020
-
-@author: samuel
-"""
-
 import DDQNAgent
 import numpy as np
 import matplotlib.pyplot as plt
 import YpacaraiMap
 from torch import save
-
 from tqdm import tqdm
-
-# Definimos los hiperparámetros #
 
 steps = 300
 epochs = 1500
@@ -30,47 +21,28 @@ replace = 50
 timesteps = 5
 input_dims = (timesteps,3,25,19)
 
-# Creamos el agente #
-
 agente = DDQNAgent.DDQNAgent(gamma, epsilon, lr, n_actions, input_dims, 
                  mem_size, batch_size, eps_min, eps_dec, replace)
 
-# Inicializamos el escenario #
-
 env = YpacaraiMap.Environment()
 
-# Wrapper para seleccionar qué es el estado #
-def do_step(env,action,ext_state):
-    
-    obs, reward, done, info = env.step(action)
-       
-    state = env.render()
-    
+def do_step(env,action,ext_state):    
+    obs, reward, done, info = env.step(action)       
+    state = env.render()    
     for t in range(timesteps-1):
-        ext_state[t] = ext_state[t+1]
-        
-    ext_state[timesteps-1] = state
-    
+        ext_state[t] = ext_state[t+1]        
+    ext_state[timesteps-1] = state    
     return ext_state, reward, done, info
     
-def reset(env):
-    
-    env.reset()
-       
-    state = env.render()
-    
-    ext_state = np.zeros((timesteps,3,25,19))
-    
-    for t in range(timesteps):
-        
-        ext_state[t] = state 
-    
+def reset(env):    
+    env.reset()       
+    state = env.render()    
+    ext_state = np.zeros((timesteps,3,25,19))    
+    for t in range(timesteps):        
+        ext_state[t] = state     
     return ext_state
 
-# Semillas #
 np.random.seed(42)
-
-# Creamos la figura #
 
 fig = plt.figure(figsize=(8, 4))
 fig.show()
@@ -82,39 +54,24 @@ filtered_reward = 0
 filtered_reward_buffer = []
 reward_buffer = []
 
-record = -100000
+record = -1000
 
-# Comenzamos el entrenamiento #
 
-for epoch in tqdm(range(0,epochs)):
-    
+for epoch in tqdm(range(0,epochs)):    
     state = reset(env)
     rew_episode = 0
-
-    # Mermamos epsilon#
     agente.decrement_epsilon()
     
     for step in range(steps):
-        
-        # Llamamos a la política de comportamiento #
         action = agente.choose_action_epsilon_greedy(state)
-        
-        # Aplicamos la acción escogida #
         next_state, reward, done, info = do_step(env,action,state)
         
-        # Guardamos la experiencia #
         agente.store_transition(state,action,reward,next_state,done)
-        
-        # El estado anterior pasa a ser el actual #
         state = next_state
         
-        # Acumulamos la recompensa total #
         rew_episode += reward
-        
-        # Entrenamos. Si no hay suficientes experiencias, learn() retorna #
         agente.learn()
         
-    # Actualizamos la red del target (si es que toca) #
     agente.replace_target_network(epoch)
 
     if epoch == 0:

@@ -40,9 +40,8 @@ filtered_reward = 0
 filtered_reward_buffer = []
 reward_buffer = []
 
-record = -100000
+record = -1000
 
-#开始训练
 for epoch in tqdm(range(0,epochs)):    
     state = reset(env)
     rew_episode = 0

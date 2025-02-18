@@ -65,7 +65,6 @@ class DDQNAgent(object):
             return
 
         self.q_eval.optimizer.zero_grad()
-        self.q_next.optimizer.zero_grad()#可删除
 
         states, actions, rewards, next_states, dones = self.sample_memory()
 
@@ -76,7 +75,6 @@ class DDQNAgent(object):
         q_eval = self.q_eval.forward(next_states)
 
         max_actions = torch.argmax(q_eval, dim=1).detach()
-        #q_next[dones] = 0.0
 
         q_target = rewards + self.gamma*q_next[indices, max_actions]
         loss = self.q_eval.loss(q_target, q_pred).to(self.q_eval.device)
