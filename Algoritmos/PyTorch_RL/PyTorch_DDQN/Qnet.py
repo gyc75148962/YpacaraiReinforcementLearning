@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-
 import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-
 
 class DeepQNetwork(nn.Module):
     def __init__(self, lr):
@@ -24,13 +22,11 @@ class DeepQNetwork(nn.Module):
 
         
     def forward(self,x):
-        
         x = F.relu(self.conv1(x))
         x = T.flatten(x, start_dim=1)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))
-        
         return x
     
     

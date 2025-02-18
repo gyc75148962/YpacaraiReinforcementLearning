@@ -1,23 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Jul 28 11:15:50 2020
-
-@author: samuel
-"""
-
 import DDQNAgent
 import numpy as np
 import matplotlib.pyplot as plt
 import YpacaraiMap
 from torch import save
-
 from tqdm import tqdm
 
-# Definimos los hiperparámetros #
-
 steps = 300
-epochs = 1500
+epochs = 2000
 gamma = 0.95
 epsilon = 0.99
 lr = 1e-3
@@ -27,44 +18,23 @@ mem_size = 10000
 batch_size = 250
 eps_min = 0.01
 eps_dec = (epsilon-eps_min)/1400
-replace = 50
+replace = 20
 
-# Creamos el agente #
-
-agente = DDQNAgent.DDQNAgent(gamma, epsilon, lr, n_actions, input_dims, 
+agent = DDQNAgent.DDQNAgent(gamma, epsilon, lr, n_actions, input_dims, 
                  mem_size, batch_size, eps_min, eps_dec, replace)
-
-# Inicializamos el escenario #
-
 env = YpacaraiMap.Environment()
 
-# Wrapper para seleccionar qué es el estado #
 def do_step(env,action):
-    
-    obs, reward, done, info = env.step(action)
-       
-    state = env.render()
-    
+    obs, reward, done, info = env.step(action)       
+    state = env.render()   
     return state, reward, done, info
     
 def reset(env):
-    
-    env.reset()
-       
+    env.reset()    
     state = env.render()
-    
     return state
 
-# Semillas #
 np.random.seed(42)
-
-# Creamos la figura #
-
-fig = plt.figure(figsize=(8, 4))
-fig.show()
-fig.canvas.draw()
-plt.xlim([0,epochs])
-plt.grid(True, which = 'both')
 
 filtered_reward = 0
 filtered_reward_buffer = []
@@ -72,38 +42,25 @@ reward_buffer = []
 
 record = -100000
 
-# Comenzamos el entrenamiento #
-
-for epoch in tqdm(range(0,epochs)):
-    
+#开始训练
+for epoch in tqdm(range(0,epochs)):    
     state = reset(env)
     rew_episode = 0
-
-    # Mermamos epsilon#
-    agente.decrement_epsilon()
+    agent.decrement_epsilon()
     
     for step in range(steps):
-        
-        # Llamamos a la política de comportamiento #
-        action = agente.choose_action_epsilon_greedy(state)
-        
-        # Aplicamos la acción escogida #
+        action = agent.choose_action_epsilon_greedy(state)
         next_state, reward, done, info = do_step(env,action)
         
-        # Guardamos la experiencia #
-        agente.store_transition(state,action,reward,next_state,done)
+        agent.store_transition(state,action,reward,next_state,done)
         
-        # El estado anterior pasa a ser el actual #
-        state = next_state
-        
-        # Acumulamos la recompensa total #
+        state = next_state        
         rew_episode += reward
         
-        # Entrenamos. Si no hay suficientes experiencias, learn() retorna #
-        agente.learn()
+        agent.learn()
         
-    # Actualizamos la red del target (si es que toca) #
-    agente.replace_target_network(epoch)
+    # 更新目标网络
+    agent.replace_target_network(epoch)
 
     if epoch == 0:
         filtered_reward = rew_episode
@@ -114,20 +71,28 @@ for epoch in tqdm(range(0,epochs)):
     filtered_reward_buffer.append(filtered_reward)
 
     if(record < rew_episode):
-        print('Nuevo record de {:06.2f} en el episodio {:d}\n'.format(rew_episode,epoch))
+        print(f"New Record: {rew_episode:06.2f} at Episode {epoch:d}\n")
         record = rew_episode
-        save(agente.q_eval, "DDQN_BEST.pt")
+        save(agent.q_eval, "DDQN_BEST.pt")
 
-    # Dibujamos la recompensa #
-    plt.plot(reward_buffer,'b',alpha=0.2)
-    plt.plot(filtered_reward_buffer,'r')
-    plt.pause(0.001)
-    fig.canvas.draw()
-    
+print('end!')
 
-print('Entrenamiento terminado!')
+save(agent.q_eval, "DDQN_LAST.pt")
 
-save(agente.q_eval, "DDQN_LAST.pt")
+# 训练结束后统一绘图
+plt.figure(figsize=(8, 4))
+plt.plot(reward_buffer, 'b', alpha=0.2, label='Original Rewards') 
+plt.plot(filtered_reward_buffer, 'r', label='Filtered Rewards')    
+plt.xlabel('Episodes')   
+plt.ylabel('Rewards')   
+plt.title('Training Rewards over Time') 
+plt.grid(True, which='both')
+plt.legend()
+plt.xlim([0, epochs])
+
+# 保存图片
+plt.savefig(f'training_rewards-{epochs}.png', dpi=300, bbox_inches='tight')
+plt.close()
         
         
 
