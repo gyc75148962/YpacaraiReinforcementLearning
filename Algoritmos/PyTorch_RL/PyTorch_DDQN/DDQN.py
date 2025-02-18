@@ -8,7 +8,7 @@ from torch import save
 from tqdm import tqdm
 
 steps = 300
-epochs = 2000
+epochs = 1500
 gamma = 0.95
 epsilon = 0.99
 lr = 1e-3

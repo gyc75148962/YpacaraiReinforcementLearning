@@ -83,7 +83,7 @@ for epoch in tqdm(range(0,epochs)):
     filtered_reward_buffer.append(filtered_reward)
 
     if(record < rew_episode):
-        print('Nuevo record de {:06.2f} en el episodio {:d}\n'.format(rew_episode,epoch))
+        print(f"New Record: {rew_episode:06.2f} at Episode {epoch:d}\n")
         record = rew_episode
         save(agente.q_eval, "DDQN_BEST.pt")
 
@@ -94,7 +94,7 @@ for epoch in tqdm(range(0,epochs)):
     fig.canvas.draw()
     
 
-print('Entrenamiento terminado!')
+print('end!')
 
 save(agente.q_eval, "DDQN_LAST.pt")
         

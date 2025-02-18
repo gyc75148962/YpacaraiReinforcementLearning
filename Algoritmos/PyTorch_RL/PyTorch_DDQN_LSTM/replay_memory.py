@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Jul 28 09:49:51 2020
-
-@author: samuel
-"""
-
 import numpy as np
 
 class ReplayBuffer(object):
