@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Jun 25
-
-@author: samuel
-"""
 
 
-# Importamos las bibliotecas de propósito general #
 import numpy as np
 from collections import deque
 from tqdm import tqdm

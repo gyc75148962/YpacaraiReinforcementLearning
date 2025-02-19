@@ -48,7 +48,8 @@ class DDQNAgent(object):
     def choose_action_epsilon_greedy(self, observation):
         if np.random.random() > self.epsilon:
             with torch.no_grad():
-                state = torch.tensor([observation],dtype=torch.float).to(self.q_eval.device)
+                observation_array = np.array([observation])
+                state = torch.tensor(observation_array,dtype=torch.float).to(self.q_eval.device)
                 actions = self.q_eval.forward(state)
                 action = torch.argmax(actions).item()
             return action

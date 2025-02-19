@@ -44,18 +44,11 @@ def reset(env):
 
 np.random.seed(42)
 
-fig = plt.figure(figsize=(8, 4))
-fig.show()
-fig.canvas.draw()
-plt.xlim([0,epochs])
-plt.grid(True, which = 'both')
-
 filtered_reward = 0
 filtered_reward_buffer = []
 reward_buffer = []
 
 record = -1000
-
 
 for epoch in tqdm(range(0,epochs)):    
     state = reset(env)
@@ -87,14 +80,17 @@ for epoch in tqdm(range(0,epochs)):
         record = rew_episode
         save(agente.q_eval, "DDQN_BEST.pt")
 
-    # Dibujamos la recompensa #
-    plt.plot(reward_buffer,'b',alpha=0.2)
-    plt.plot(filtered_reward_buffer,'r')
-    plt.pause(0.001)
-    fig.canvas.draw()
-    
-
 print('end!')
+
+plt.figure(figsize=(8, 4))
+plt.plot(reward_buffer, 'b', alpha=0.2, label='Raw Reward')
+plt.plot(filtered_reward_buffer, 'r', label='Filtered Reward')
+plt.xlabel('Episodes')
+plt.ylabel('Reward')
+plt.title('Training Rewards Over Time')
+plt.grid(True, which='both')
+plt.legend()
+plt.show()
 
 save(agente.q_eval, "DDQN_LAST.pt")
         
