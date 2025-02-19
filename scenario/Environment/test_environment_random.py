@@ -1,38 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jun 17 14:47:24 2020
-
-Test de verificación del entorno creado. Se cargará el entorno diseñado y se
-comprobará que funcionan de forma adecuada todas las funciones necesarias para 
-el efectivo entrenamiento de la tarea que se quiere llevar a cabo.
-
-@author: samuel
+对创建的环境进行验证测试。设计的环境将被加载并
+检查所有必要的函数
+对要执行的任务进行有效培训。
 """
-
-# Importamos las librerias necesarias #
 import numpy as np
 import matplotlib.pyplot as plt
 import YpacaraiMap
 from time import sleep
 
 
-# Cargamos el escenario #
-
 env = YpacaraiMap.Environment()
 
-# Creamos una ventana para realizar el renderizado #
 
-
-# Reseteamos el entorno #
-" Habría que introducir que al resetear el barco surja en un pto. aleatorio."
 env.reset()
 
-# Creamos los estimulos que le vamos a dar al robot (bucle abierto) 
 N = 1000 # Numero de accionea aleatorias
 acciones = np.random.randint(0,7,size = N)
 
-# Bucle de las acciones #
 
 fig, (ax1,ax2,ax3) = plt.subplots(1,3, figsize=(16,8))
 
@@ -74,10 +60,3 @@ ax2.imshow(VM, cmap = 'gray')
 ax3.imshow(IM,interpolation='bicubic', cmap = 'jet_r')
 
 plt.show()
-
-
-
-
-
-
-

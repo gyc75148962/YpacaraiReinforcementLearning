@@ -1,12 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Jun 26 17:20:44 2020
 
-@author: samuel
-"""
 
-# Importamos las librerias necesarias #
 import numpy as np
 from time import sleep
 import pushover
@@ -26,10 +21,8 @@ import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
 
-# Importamos nuestro escenario custom #
 import YpacaraiMap
 
-# Cargamos el escenario 
 env = YpacaraiMap.Environment()
 env.set_test_mode(True)
 
@@ -47,14 +40,12 @@ ax3.grid(True, linewidth = 0.5, alpha = 0.2, drawstyle = 'steps-mid')
 
 plt.setp(ax3.get_xticklabels(), rotation_mode="anchor")
 
-fig.suptitle('Mapas de estado del barco')
+fig.suptitle('Ship status map')
 
 
-# Eliminamos la sesión anterior de Keras por si acaso #
 clear_session()
 
 
-# Wrapper para seleccionar y componer el estado como las dos matrices
 def do_step(env,action):
     
     obs, reward, done, info = env.step(action)
@@ -71,10 +62,8 @@ def reset(env):
     
     return state    
 
-# Ejecutamos la mejor de las partidas #
 obs = env.reset()
 
-#state = np.dstack((obs['visited_map'],obs['importance_map']))
 state = env.render()
 
 N = 500
@@ -87,7 +76,6 @@ num = 0
 
 for steps in range(N):
    
-    # Predicción y accion #
     q_values = model.predict(state[np.newaxis])
     
     if np.random.rand()<0.9:
@@ -152,17 +140,16 @@ for steps in range(N):
             
     obs,rew,done,info = env.step(action)
     
-    print("Paso n: {}".format(steps))
+    print(f"Step n: {steps}")
     
     reward += rew
    
-    #state = np.dstack((obs['visited_map'],obs['importance_map']))
     state = env.render()
     position = obs['position']
         
-    print("\rLa recompensa de esta acción ha sido: {0:.3f}".format(rew))
+    print(f"The reward for this action has been: {rew:.3f}")
 
-print("Terminado con reward {}".format(reward))
+print(f"Finished with reward {reward}")
 
 VM = obs['visited_map']
 IM = obs['importance_map']
